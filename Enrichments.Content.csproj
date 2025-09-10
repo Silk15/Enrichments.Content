@@ -56,10 +56,12 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="EnrichmentBoltPylons.cs" />
+        <Compile Include="EnrichmentBurdeningGuard.cs" />
         <Compile Include="EnrichmentCindertrace.cs" />
         <Compile Include="EnrichmentElectrostaticPulse.cs" />
         <Compile Include="EnrichmentHellbloom.cs" />
         <Compile Include="EnrichmentFlashpoint.cs" />
+        <Compile Include="EnrichmentMassDriver.cs" />
         <Compile Include="EnrichmentSunderingForce.cs" />
         <Compile Include="MaxDepthDetector.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
