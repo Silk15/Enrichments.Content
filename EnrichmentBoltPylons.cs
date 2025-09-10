@@ -2,7 +2,7 @@
 
 namespace Enrichments;
 
-public class EnrichmentBoltPylons
+public class EnrichmentBoltPylons : EnrichmentData
 {
     public class BoltPylon : ThunderScript
     {

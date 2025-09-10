@@ -37,21 +37,21 @@
         <NoWarn>1591</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="Enrichments">
-          <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\StreamingAssets\Mods\Enrichments\Enrichments.dll</HintPath>
-        </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
         <Reference Include="System.Xml"/>
+        <Reference Include="Enrichments">
+            <HintPath>$(BladeAndSorceryPath)\BladeAndSorcery_Data\StreamingAssets\Mods\Enrichments\Enrichments.dll</HintPath>
+        </Reference>
         <Reference Include="ThunderRoad">
-          <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\ThunderRoad.dll</HintPath>
+          <HintPath>$(BladeAndSorceryPath)\BladeAndSorcery_Data\Managed\ThunderRoad.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-          <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+          <HintPath>$(BladeAndSorceryPath)\BladeAndSorcery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">
-          <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+          <HintPath>$(BladeAndSorceryPath)\BladeAndSorcery_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
