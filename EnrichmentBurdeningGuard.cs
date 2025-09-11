@@ -42,7 +42,7 @@ public class EnrichmentBurdeningGuard : EnrichmentData
     private void OnCreatureAttackParry(Creature parriedcreature, Item parrieditem, Creature parryingcreature, Item parryingitem, CollisionInstance hit)
     {
         bool hasImbue = parryingitem.imbues.Find(x => x.spellCastBase is SpellCastGravity) != null;
-        if (!hasImbue || EnrichmentManager.HasEnrichment(parryingitem, id) || !IsValidTarget(parriedcreature, null) || hit.impactVelocity.sqrMagnitude < requiredVelocity * requiredVelocity) return;
+        if (!hasImbue || !EnrichmentManager.HasEnrichment(parryingitem, id) || !IsValidTarget(parriedcreature, null) || hit.impactVelocity.sqrMagnitude < requiredVelocity * requiredVelocity) return;
         
         Vector3 direction = parriedcreature.ragdoll.targetPart.transform.position - hit.contactPoint;
         parriedcreature.TryPush(Creature.PushType.Magic, direction, 1, RagdollPart.Type.Torso);

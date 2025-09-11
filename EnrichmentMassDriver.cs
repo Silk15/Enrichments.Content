@@ -46,7 +46,7 @@ public class EnrichmentMassDriver : EnrichmentData
         Creature hitCreature = hit?.targetColliderGroup?.collisionHandler?.ragdollPart?.ragdoll?.creature;
         if (hit == null || hitCreature is null || spelldata is not SpellCastGravity || fired || eventtime != EventTime.OnStart || !IsValidTarget(hitCreature, spelldata) || hit.impactVelocity.sqrMagnitude < requiredVelocity * requiredVelocity) return;
         
-        foreach (Creature creature in Creature.InRadius(hitCreature.ragdoll.targetPart.transform.position, searchRadius, creature => IsValidTarget(creature, spelldata)))
+        foreach (Creature creature in Creature.InRadius(hitCreature.ragdoll.targetPart.transform.position, searchRadius, creature => IsValidTarget(creature, spelldata) && creature != hitCreature))
         {
             Vector3 start = creature.ragdoll.targetPart.transform.position - hit.impactVelocity.normalized * pointOffset;
             Vector3 direction = hit.impactVelocity.normalized;
