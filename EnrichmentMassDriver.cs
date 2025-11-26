@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using ThunderRoad;
 using ThunderRoad.Skill.Spell;
@@ -9,17 +9,19 @@ namespace Enrichments;
 /// <summary>
 /// Written by Phantom
 /// </summary>
-public class EnrichmentSunderingForce : EnrichmentData
+public class EnrichmentMassDriver : EnrichmentData
 {
     public string effectId;
-    public float requiredVelocity = 0.5f;
-    public float forceMultiplier = 2f;
+    public float searchRadius = 3f;
+    public float pointOffset = 1.5f;
+    public float forceMultiplier = 15f;
+    public float requiredVelocity = 5f;
     public float creatureCooldown = 2f;
-
+    
     public EffectData effectData;
 
     private List<Creature> seenCreatures = new();
-
+    
     public bool IsValidTarget(Creature target, SpellCastCharge spellData) => target != null && !target.isCulled && target != spellData?.spellCaster.ragdollHand.creature && !seenCreatures.Contains(target);
 
     public override void OnCatalogRefresh()
@@ -42,19 +44,23 @@ public class EnrichmentSunderingForce : EnrichmentData
         imbue.OnImbueHit -= OnImbueHit;
     }
 
-    private void OnImbueHit(SpellCastCharge spelldata, float amount, bool fired, CollisionInstance hit, EventTime eventtime)
+    private void OnImbueHit(SpellCastCharge spellData, float amount, bool fired, CollisionInstance hit, EventTime eventTime)
     {
         Creature hitCreature = hit?.targetColliderGroup?.collisionHandler?.ragdollPart?.ragdoll?.creature;
-        if (hit == null || spelldata is not SpellCastGravity || fired || eventtime != EventTime.OnStart || !IsValidTarget(hitCreature, spelldata) || hit.impactVelocity.sqrMagnitude < requiredVelocity * requiredVelocity) return;
-        if (!hit.targetCollider.attachedRigidbody.TryGetComponent(out RagdollPart ragdollPart) || ragdollPart.ragdoll.creature.isPlayer || ragdollPart.isSliced || !ragdollPart.sliceAllowed) return;
-        ragdollPart.Slice();
-        ragdollPart.physicBody.AddForce(hit.impactVelocity * forceMultiplier, ForceMode.VelocityChange);
-        if (!hitCreature.isKilled) hitCreature.Kill();
-        effectData?.Spawn(hit.contactPoint, Quaternion.LookRotation(hit.contactNormal), parent: ragdollPart.transform)?.Play();
-        seenCreatures.Add(hitCreature);
-        hitCreature.StartCoroutine(CooldownRoutine(hitCreature));
+        if (hit == null || hitCreature is null || spellData is not SpellCastGravity || fired || eventTime != EventTime.OnStart || !IsValidTarget(hitCreature, spellData) || hit.impactVelocity.sqrMagnitude < requiredVelocity * requiredVelocity) return;
+        
+        foreach (Creature creature in Creature.InRadius(hitCreature.ragdoll.targetPart.transform.position, searchRadius, creature => IsValidTarget(creature, spellData) && creature != hitCreature))
+        {
+            Vector3 start = creature.ragdoll.targetPart.transform.position - hit.impactVelocity.normalized * pointOffset;
+            Vector3 direction = hit.impactVelocity.normalized;
+            creature.TryPush(Creature.PushType.Magic, direction, 1, RagdollPart.Type.Torso);
+            creature.AddForce(direction * forceMultiplier, ForceMode.Impulse);
+            effectData?.Spawn(start, Quaternion.LookRotation(direction)).Play();
+            seenCreatures.Add(creature);
+            creature.StartCoroutine(CooldownRoutine(creature));
+        }
     }
-
+    
     private IEnumerator CooldownRoutine(Creature target)
     {
         yield return Yielders.ForRealSeconds(creatureCooldown);

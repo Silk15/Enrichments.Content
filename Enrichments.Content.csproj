@@ -47,6 +47,9 @@
         <Reference Include="ThunderRoad">
           <HintPath>$(BladeAndSorceryPath)\BladeAndSorcery_Data\Managed\ThunderRoad.dll</HintPath>
         </Reference>
+        <Reference Include="ThunderRoad.MaterialInstance">
+          <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\ThunderRoad.MaterialInstance.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.CoreModule">
           <HintPath>$(BladeAndSorceryPath)\BladeAndSorcery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
@@ -56,10 +59,13 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="EnrichmentBoltPylons.cs" />
+        <Compile Include="EnrichmentBurdeningGuard.cs" />
         <Compile Include="EnrichmentCindertrace.cs" />
+        <Compile Include="EnrichmentElectroconductive.cs" />
         <Compile Include="EnrichmentElectrostaticPulse.cs" />
         <Compile Include="EnrichmentHellbloom.cs" />
         <Compile Include="EnrichmentFlashpoint.cs" />
+        <Compile Include="EnrichmentMassDriver.cs" />
         <Compile Include="EnrichmentSunderingForce.cs" />
         <Compile Include="MaxDepthDetector.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>

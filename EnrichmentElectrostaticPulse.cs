@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
 using ThunderRoad;
 using ThunderRoad.Skill.Spell;
 using UnityEngine;
@@ -44,12 +43,15 @@ public class EnrichmentElectrostaticPulse : EnrichmentData
 
     IEnumerator ShockRoutine(SpellCastLightning spellCastLightning, CollisionInstance hit, int boltCount)
     {
-        var entities = ThunderEntity.InRadius(hit.contactPoint, shockRadius);
+        var entities = Creature.InRadius(hit.contactPoint, shockRadius);
         for (int i = 0; i < boltCount; i++)
         {
             var entity = entities[Random.Range(0, Mathf.Min(boltCount, entities.Count))];
-            var closestPoint = entity is Creature creature ? creature.GetComponentsInChildren<ColliderGroup>().ClosestToPoint(hit.contactPoint).ClosestPoint(hit.contactPoint) : entity is Item item ? item.colliderGroups.ClosestToPoint(hit.contactPoint).ClosestPoint(hit.contactPoint) : entity.transform.position;
+            if (entity.isPlayer && Item.owner == Item.Owner.Player) entities.Remove(entity);
+            if (entities.Count == 0) break;
+            var closestPoint = entity.GetComponentsInChildren<ColliderGroup>().ClosestToPoint(hit.contactPoint).ClosestPoint(hit.contactPoint);
             spellCastLightning.PlayBolt(sourcePos: hit.contactPoint, targetPos: closestPoint);
+            spellCastLightning.boltHitEffectData.Spawn(closestPoint, Quaternion.identity).Play();
             yield return Yielders.ForSeconds(Random.Range(0.025f, 0.05f));
         }
     }

@@ -20,7 +20,9 @@ namespace Enrichments
 
         private List<object> handlers = new();
 
-        public event OnPenetrateMaxDepth OnPenetrateMaxDepthEvent;
+        public event PenetrateDelegate OnPenetrateMaxDepthEvent;
+        public event PenetrateDelegate OnMaxDepthResetEvent;
+        public event PenetrateDelegate OnUnpenetrateEvent;
 
         public override ManagedLoops EnabledManagedLoops => ManagedLoops.Update;
 
@@ -40,8 +42,8 @@ namespace Enrichments
             this.requireUnpenetrateToReset = requireUnpenetrateToReset;
             foreach (Damager damager in damagers)
             {
-                damager.OnUnpenetrateEvent -= OnUnpenetrateEvent;
-                damager.OnUnpenetrateEvent += OnUnpenetrateEvent;
+                damager.OnUnpenetrateEvent -= OnUnpenetrate;
+                damager.OnUnpenetrateEvent += OnUnpenetrate;
             }
 
             active = true;
@@ -51,7 +53,7 @@ namespace Enrichments
         public void Deactivate(object handler)
         {
             if (!damagers.IsNullOrEmpty()) foreach (Damager damager in damagers) 
-                damager.OnUnpenetrateEvent -= OnUnpenetrateEvent;
+                damager.OnUnpenetrateEvent -= OnUnpenetrate;
             active = false;
             if (handlers.Contains(handler)) handlers.Remove(handler);
             if (handlers.IsNullOrEmpty()) Destroy(this);
@@ -78,15 +80,20 @@ namespace Enrichments
                     OnPenetrateMaxDepthEvent?.Invoke(damager, collision, damager.collisionHandler.item.Velocity, collision.damageStruct.lastDepth);
                 }
                 else if (!requireUnpenetrateToReset && collision.damageStruct.lastDepth < GetResetThreshold(damager.penetrationDepth))
+                {
+                    OnMaxDepthResetEvent?.Invoke(damager, collision, damager.collisionHandler.item.Velocity, collision.damageStruct.lastDepth);
                     hasReachedMaxDepth = false;
+                }
+                    
             }
         }
 
-        private void OnUnpenetrateEvent(Damager damager, CollisionInstance collision, bool wentthrough, EventTime time)
+        private void OnUnpenetrate(Damager damager, CollisionInstance collision, bool wentthrough, EventTime time)
         {
+            OnUnpenetrateEvent?.Invoke(damager, collision, damager.collisionHandler.item.Velocity, collision.damageStruct.lastDepth);
             hasReachedMaxDepth = false;
         }
 
-        public delegate void OnPenetrateMaxDepth(Damager damager, CollisionInstance collision, Vector3 velocity, float depth);
+        public delegate void PenetrateDelegate(Damager damager, CollisionInstance collision, Vector3 velocity, float depth);
     }
 }

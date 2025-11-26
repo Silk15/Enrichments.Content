@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using ThunderRoad;
+using ThunderRoad.Skill;
 using ThunderRoad.Skill.Spell;
 using UnityEngine;
 
@@ -176,11 +178,11 @@ namespace Enrichments
                             break;
                     }
                 }
-
                 kindlingEffectInstance?.End();
             }
 
-            public class KindlingData : CustomData
+            [Serializable]
+            public class KindlingData
             {
                 public string kindlingEffectId;
                 public string explosionEffectId;
@@ -196,9 +198,8 @@ namespace Enrichments
                 public EffectData kindlingEffectData;
                 public EffectData explosionEffectData;
 
-                public override void OnCatalogRefresh()
+                public void OnCatalogRefresh()
                 {
-                    base.OnCatalogRefresh();
                     kindlingEffectData = Catalog.GetData<EffectData>(kindlingEffectId);
                     explosionEffectData = Catalog.GetData<EffectData>(explosionEffectId);
                 }
