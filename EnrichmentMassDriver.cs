@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ThunderRoad;
 using ThunderRoad.Skill.Spell;
+using TriInspector;
 using UnityEngine;
 
 namespace Enrichments;
@@ -11,17 +13,21 @@ namespace Enrichments;
 /// </summary>
 public class EnrichmentMassDriver : EnrichmentData
 {
-    public string effectId;
     public float searchRadius = 3f;
     public float pointOffset = 1.5f;
     public float forceMultiplier = 15f;
     public float requiredVelocity = 5f;
     public float creatureCooldown = 2f;
     
+    [NonSerialized]
     public EffectData effectData;
-
+    
+    [Dropdown(nameof(GetAllEffectID))]
+    public string effectId;
+    
     private List<Creature> seenCreatures = new();
     
+    #if !SDK
     public bool IsValidTarget(Creature target, SpellCastCharge spellData) => target != null && !target.isCulled && target != spellData?.spellCaster.ragdollHand.creature && !seenCreatures.Contains(target);
 
     public override void OnCatalogRefresh()
@@ -66,4 +72,5 @@ public class EnrichmentMassDriver : EnrichmentData
         yield return Yielders.ForRealSeconds(creatureCooldown);
         seenCreatures.Remove(target);
     }
+    #endif
 }

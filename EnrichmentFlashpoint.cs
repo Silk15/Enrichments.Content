@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ThunderRoad;
 using ThunderRoad.Skill;
 using ThunderRoad.Skill.Spell;
+using TriInspector;
 using UnityEngine;
 
 namespace Enrichments
@@ -19,6 +20,7 @@ namespace Enrichments
 
         private List<Creature> seenCreatures = new();
 
+        #if !SDK
         public bool IsValidTarget(Creature target, SpellCastCharge spellData) => target != null && !target.isCulled && !target.isKilled && target != spellData?.spellCaster.ragdollHand.creature && !seenCreatures.Contains(target);
 
         public override void OnItemImbued(Item item, Imbue imbue, SpellCastCharge spellCastCharge)
@@ -54,19 +56,31 @@ namespace Enrichments
             yield return new WaitForSecondsRealtime(creatureCooldown);
             seenCreatures.Remove(target);
         }
+        #endif
 
         public class Kindling : ThunderBehaviour
         {
             private float startTime;
             private bool ready;
 
+            [NonSerialized]
             public KindlingData data;
+            
+            [NonSerialized]
             public RagdollPart ragdollPart;
+            
+            [NonSerialized]
             public Item weapon;
+            
+            [NonSerialized]
             public Creature ignoredCreature;
+            
+            #if !SDK
             private EffectInstance kindlingEffectInstance;
+            #endif
             private SphereCollider sphereCollider;
 
+            #if !SDK
             /// <summary>
             /// Prepares a Kindling on a creature's ragdoll part, which will wait for the triggered weapon to leave the impact area, then wait for the weapon to re-enter before exploding.
             /// </summary>
@@ -101,6 +115,13 @@ namespace Enrichments
                 sphereCollider.isTrigger = true;
                 sphereCollider.enabled = true;
                 startTime = Time.time;
+
+                // Added so that thrown weapons such as arrows and daggers automatically detonate the flashpoint
+                if (item.isFlying && item.data.flags.HasFlag(ItemFlags.Throwable))
+                {
+                    Explode();
+                    TrySlice(ragdollPart);
+                }
             }
 
             /// <summary>
@@ -123,13 +144,7 @@ namespace Enrichments
                 if (!other.TryGetComponentInParent(out Item item) || item != weapon || !ready) return;
 
                 Explode();
-
-                if (ragdollPart.isSliced && !ragdollPart.sliceAllowed)
-                    return;
-                ragdollPart.SafeSlice(); // TODO: always dismembers at the torso joint, could be improved
-                ragdollPart.physicBody.AddForce(ragdollPart.upDirection.normalized * data.dismemberForce, ForceMode.VelocityChange);
-                if (!ragdollPart.ragdoll.creature.isKilled)
-                    ragdollPart.ragdoll.creature.Kill();
+                TrySlice(ragdollPart);
             }
 
             /// <summary>
@@ -142,6 +157,16 @@ namespace Enrichments
                 // Initial hit has left the impact area, prep the Kindling for explosion
                 sphereCollider.radius = data.detonateTriggerRadius;
                 ready = true;
+            }
+            
+            public void TrySlice(RagdollPart ragdollPart)
+            {
+                if (ragdollPart.isSliced && !ragdollPart.sliceAllowed)
+                    return;
+                ragdollPart.SafeSlice(); // TODO: always dismembers at the torso joint, could be improved
+                ragdollPart.physicBody.AddForce(ragdollPart.upDirection.normalized * data.dismemberForce, ForceMode.VelocityChange);
+                if (!ragdollPart.ragdoll.creature.isKilled)
+                    ragdollPart.ragdoll.creature.Kill();
             }
 
             /// <summary>
@@ -180,12 +205,11 @@ namespace Enrichments
                 }
                 kindlingEffectInstance?.End();
             }
+            #endif
 
             [Serializable]
             public class KindlingData
             {
-                public string kindlingEffectId;
-                public string explosionEffectId;
                 public float duration = 1.5f;
                 public float readyExitRadius = 0.5f;
                 public float detonateTriggerRadius = 0.1f;
@@ -195,14 +219,27 @@ namespace Enrichments
                 public float explosionEffectScale = 0.3f;
                 public float dismemberForce = 3f;
 
+                [NonSerialized]
                 public EffectData kindlingEffectData;
+                
+                [Dropdown(nameof(GetAllEffectID))]
+                public string kindlingEffectId;
+                
+                [NonSerialized]
                 public EffectData explosionEffectData;
+                
+                [Dropdown(nameof(GetAllEffectID))]
+                public string explosionEffectId;
 
+                #if !SDK
                 public void OnCatalogRefresh()
                 {
                     kindlingEffectData = Catalog.GetData<EffectData>(kindlingEffectId);
                     explosionEffectData = Catalog.GetData<EffectData>(explosionEffectId);
                 }
+                #endif   
+                
+                public TriDropdownList<string> GetAllEffectID() => Catalog.GetDropdownAllID(Category.Effect);
             }
         }
     }

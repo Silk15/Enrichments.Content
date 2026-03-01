@@ -10,14 +10,15 @@ namespace Enrichments
     /// </summary>
     public class EnrichmentHellbloom : EnrichmentData
     {
-        public float depthRequirementRatio = 0.9f;
-        public float eventResetRatio = 0.2f;
         public bool requireUnpenetrateToReset = true;
         public bool allowSlash = true;
         public bool allowIgnited = true;
+        public float depthRequirementRatio = 0.5f;
+        public float eventResetRatio = 0.2f;
 
         private StatusDataBurning statusData;
 
+        #if !SDK
         public bool IsValidTarget(Creature target, SpellCastCharge spellData) => target != null && !target.isCulled && target != spellData?.spellCaster.ragdollHand.creature;
 
         public override void OnCatalogRefresh()
@@ -57,5 +58,6 @@ namespace Enrichments
             status.Heat = statusData.maxHeat;
             FlameWall.Create(hitCreature.ragdoll.targetPart.transform.position).Init(Catalog.GetData<SkillTwinFlame>("TwinFlame"));
         }
+        #endif
     }
 }

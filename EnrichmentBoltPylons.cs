@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using ThunderRoad;
 using ThunderRoad.Pools;
 using ThunderRoad.Skill.Spell;
+using TriInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,13 +15,24 @@ public class EnrichmentBoltPylons : EnrichmentData
     public float shockRadius = 5f;
     public float speedMultiplier = 0.05f;
     public bool requireUnpenetrateToReset;
+    
+    [NonSerialized]
+    public EffectData pylonEffectData;
+    
+    [Dropdown(nameof(GetAllEffectID))]
     public string pylonEffectId;
+    
+    [NonSerialized]
+    public StatusData statusData;
+    
+    [Dropdown(nameof(GetAllStatusID))]
     public string statusId;
     
+    [NonSerialized]
     public SkillThunderbolt skillThunderbolt;
-    private EffectData pylonEffectData;
-    private StatusData statusData;
-
+    
+    #if !SDK
+    
     public override void OnCatalogRefresh()
     {
         base.OnCatalogRefresh();
@@ -158,4 +171,5 @@ public class EnrichmentBoltPylons : EnrichmentData
             active = false;
         }
     }
+    #endif
 }

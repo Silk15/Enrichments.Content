@@ -1,17 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using ThunderRoad;
 using ThunderRoad.Skill.Spell;
+using TriInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Enrichments;
 
 public class EnrichmentElectrostaticPulse : EnrichmentData
 {
-    public string pulseEffectId;
     public float shockRadius;
 
-    protected EffectData pulseEffectData;
+    [NonSerialized]
+    public EffectData pulseEffectData;
+    
+    [Dropdown(nameof(GetAllEffectID))]
+    public string pulseEffectId;
 
+    #if !SDK
     public override void OnCatalogRefresh()
     {
         base.OnCatalogRefresh();
@@ -55,4 +62,5 @@ public class EnrichmentElectrostaticPulse : EnrichmentData
             yield return Yielders.ForSeconds(Random.Range(0.025f, 0.05f));
         }
     }
+    #endif
 }

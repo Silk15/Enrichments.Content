@@ -13,6 +13,8 @@ public class EnrichmentElectroconductive : EnrichmentData
     public int minBolts = 3;
     public int maxBolts = 5;
     public float minImpactVelocity = 5f;
+    
+    #if !SDK
 
     public override void OnItemImbued(Item item, Imbue imbue, SpellCastCharge spellCastCharge)
     {
@@ -74,4 +76,5 @@ public class EnrichmentElectroconductive : EnrichmentData
             yield return Yielders.ForSeconds(0.085f);
         }
     }
+    #endif
 }

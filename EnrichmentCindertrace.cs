@@ -1,5 +1,7 @@
-﻿using ThunderRoad;
+﻿using System;
+using ThunderRoad;
 using ThunderRoad.Skill.Spell;
+using TriInspector;
 using UnityEngine;
 
 namespace Enrichments;
@@ -7,11 +9,19 @@ namespace Enrichments;
 public class EnrichmentCindertrace : EnrichmentData
 {
     public float minHorizontalVelocity = 0.5f;
-    public string dragEffectId = "CindertraceDrag";
+    
+    [Dropdown(nameof(GetAllSpellID))]
     public string spellId = "Fire";
-
+    
+    [NonSerialized]
+    public EffectData dragEffectData;
+    
+    [Dropdown(nameof(GetAllEffectID))]
+    public string dragEffectId = "CindertraceDrag";
+    
     protected int spellHashId;
-    protected EffectData dragEffectData;
+    
+    #if !SDK
     
     public override void OnCatalogRefresh()
     {
@@ -31,29 +41,32 @@ public class EnrichmentCindertrace : EnrichmentData
         base.OnItemUnimbued(item, imbue, spellCastCharge);
         if (spellCastCharge is SpellCastProjectile spell && spell.hashId == spellHashId && item.TryGetComponent(out Cindertrace cindertrace)) cindertrace.Disable();
     }
-
+    #endif
 
     public class Cindertrace : ThunderBehaviour
     {
+        [NonSerialized]
         public EnrichmentCindertrace enrichmentCindertrace;
+        
+        [NonSerialized]
         public Item item;
         
         private bool canRun;
         private float lastFlamewallTime;
         private float flamewallCooldown = 0.175f;
         private Vector3 flamewallOffset = new(0, 0.3f, 0);
+        private SkillTwinFlame flamewallSkillData;
         
+        #if !SDK
         public void Enable(Item item, EnrichmentCindertrace enrichmentCindertrace)
         {
+            flamewallSkillData = Catalog.GetData<SkillTwinFlame>("TwinFlame");
             this.enrichmentCindertrace = enrichmentCindertrace;
             this.item = item;
             canRun = true;
         }
 
-        public void Disable()
-        {
-            canRun = false;
-        }
+        public void Disable() => canRun = false;
 
         public void OnCollisionStay(Collision other)
         {
@@ -65,8 +78,9 @@ public class EnrichmentCindertrace : EnrichmentData
             }
             lastFlamewallTime = Time.time;
             var flamewall = FlameWall.Create(other.GetContact(0).point + flamewallOffset);
-            flamewall.Init(Catalog.GetData<SkillTwinFlame>("TwinFlame"));
+            flamewall.Init(flamewallSkillData);
             flamewall.transform.localScale *= 0.4f;
         }
+        #endif
     }
 }

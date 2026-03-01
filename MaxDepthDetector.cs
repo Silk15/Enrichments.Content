@@ -1,3 +1,4 @@
+#if !SDK
 using System.Collections.Generic;
 using System.Linq;
 using ThunderRoad;
@@ -97,3 +98,4 @@ namespace Enrichments
         public delegate void PenetrateDelegate(Damager damager, CollisionInstance collision, Vector3 velocity, float depth);
     }
 }
+#endif
