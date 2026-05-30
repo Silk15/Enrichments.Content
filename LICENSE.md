@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Oscar Harris
+# Copyright (c) 2026 Oscar Harris (Silk15, Silk, thesilk)
 
 ## Permitted Use
 Permission to access and view this file is granted free of charge to any person obtaining a copy of my code or associated documentation, to study, run and modify the codebase for **personal, non-commercial educational purposes only!**
